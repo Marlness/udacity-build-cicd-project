@@ -42,5 +42,4 @@ jobs:
       - name: Deploy to EKS
         run: |
           cd starter/backend/k8s
-          kubectl apply -f deployment.yml
-          kubectl apply -f service.yml
+          kubectl apply -f .
