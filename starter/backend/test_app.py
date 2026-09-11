@@ -27,3 +27,4 @@ def test_movies_endpoint_returns_valid_data():
 # trigger build
 # trigger deployment
 # rerun pipelines
+# backend trigger
