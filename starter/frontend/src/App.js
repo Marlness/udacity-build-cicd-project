@@ -27,3 +27,4 @@ export default function App() {
 }
 # trigger frontend build
 # trigger deployment
+# rerun pipelines
