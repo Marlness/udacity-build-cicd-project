@@ -25,5 +25,3 @@ export default function App() {
     </div>
   );
 }
-# trigger frontend build
-# rerun pipelines
