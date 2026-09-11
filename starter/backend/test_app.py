@@ -24,3 +24,4 @@ def test_movies_endpoint_returns_valid_data():
         assert isinstance(data.get("movies"), list)
         assert len(data["movies"]) > 0
         assert "title" in data["movies"][0]
+# trigger build
