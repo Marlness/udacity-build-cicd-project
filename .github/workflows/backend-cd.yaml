@@ -78,6 +78,6 @@ jobs:
           ECR_REPOSITORY: backend
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          cd ../k8s
+          cd k8s
           kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           kustomize build | kubectl apply -f -
