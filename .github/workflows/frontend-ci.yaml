@@ -1,9 +1,11 @@
 name: Frontend Continuous Integration
 
 on:
+  push:
+    branches: [ main, latest_branch ]
   pull_request:
-    branches: [ "main" ]
-
+    branches: [ main, latest_branch ]
+    
 defaults:
   run:
     working-directory: starter/frontend

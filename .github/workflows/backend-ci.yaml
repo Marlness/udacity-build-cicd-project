@@ -1,8 +1,10 @@
 name: Backend Continuous Integration
 
 on:
+  push:
+    branches: [ main, latest_branch ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main, latest_branch ]
 
 defaults:
   run:
