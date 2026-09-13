@@ -21,4 +21,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Start the React app when the container starts
-CMD ["npm", "run", "serve"]
+CMD ["npx", "serve", "-s", "build", "-l", "3000"]

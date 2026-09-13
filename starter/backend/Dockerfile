@@ -22,5 +22,4 @@ RUN cd /app && pipenv install --system --skip-lock
 
 COPY . /app
 
-CMD uwsgi --http :5000 --master --enable-threads -s /var/www/app/app.sock --manage-script-name --mount /=app:app 
-#this
+CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--manage-script-name", "--mount", "/=app:app"]

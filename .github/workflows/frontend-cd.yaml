@@ -89,7 +89,7 @@ jobs:
         run: |
           kubectl apply -k starter/frontend/k8s
           kubectl set image deployment/frontend frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          kubectl rollout status deployment/frontend --timeout=180s
+          kubectl rollout status deployment/frontend --timeout=180s || (kubectl describe deployment frontend; kubectl get pods -l app=frontend; exit 1)
 
       - name: Verify frontend service
         working-directory: .

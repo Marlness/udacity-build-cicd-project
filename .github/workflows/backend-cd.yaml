@@ -86,7 +86,7 @@ jobs:
         run: |
           kubectl apply -k starter/backend/k8s
           kubectl set image deployment/backend backend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          kubectl rollout status deployment/backend --timeout=180s
+          kubectl rollout status deployment/backend --timeout=180s || (kubectl describe deployment backend; kubectl get pods -l app=backend; exit 1)
 
       - name: Verify backend service
         working-directory: .
