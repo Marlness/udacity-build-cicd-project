@@ -49,7 +49,6 @@ jobs:
       AWS_REGION: us-east-1
       ECR_REPOSITORY: backend
       IMAGE_TAG: ${{ github.sha }}
-      ECR_REGISTRY: ${{ vars.ECR_REGISTRY || steps.login-ecr.outputs.registry }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -72,6 +71,8 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push backend image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           echo "ECR_REGISTRY=$ECR_REGISTRY"
           docker build -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" -t "$ECR_REGISTRY/$ECR_REPOSITORY:latest" .

@@ -47,7 +47,6 @@ jobs:
       AWS_REGION: us-east-1
       ECR_REPOSITORY: frontend
       IMAGE_TAG: ${{ github.sha }}
-      ECR_REGISTRY: ${{ vars.ECR_REGISTRY || steps.login-ecr.outputs.registry }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -71,6 +70,7 @@ jobs:
 
       - name: Build and push frontend image
         env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REACT_APP_MOVIE_API_URL: ${{ secrets.REACT_APP_MOVIE_API_URL }}
         run: |
           echo "ECR_REGISTRY=$ECR_REGISTRY"
