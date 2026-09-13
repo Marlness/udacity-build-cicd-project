@@ -68,12 +68,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region "$AWS_REGION" --name cluster
+
       - name: Build and push frontend image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REACT_APP_MOVIE_API_URL: ${{ secrets.REACT_APP_MOVIE_API_URL }}
         run: |
-          echo "ECR_REGISTRY=$ECR_REGISTRY"
+          export BACKEND_HOST=$(kubectl get svc backend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || echo 'localhost')
+          export REACT_APP_MOVIE_API_URL="http://${BACKEND_HOST}"
+          echo "BACKEND_HOST=$BACKEND_HOST"
+          echo "REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL"
           docker build \
             --build-arg REACT_APP_MOVIE_API_URL="$REACT_APP_MOVIE_API_URL" \
             -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" \
@@ -81,9 +86,6 @@ jobs:
             .
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
-
-      - name: Update kubeconfig
-        run: aws eks update-kubeconfig --region "$AWS_REGION" --name cluster
 
       - name: Apply Kustomize deployment
         working-directory: .
