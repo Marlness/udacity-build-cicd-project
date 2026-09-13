@@ -47,6 +47,7 @@ jobs:
       AWS_REGION: us-east-1
       ECR_REPOSITORY: frontend
       IMAGE_TAG: ${{ github.sha }}
+      ECR_REGISTRY: ${{ vars.ECR_REGISTRY || steps.login-ecr.outputs.registry }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,9 +71,9 @@ jobs:
 
       - name: Build and push frontend image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REACT_APP_MOVIE_API_URL: ${{ secrets.REACT_APP_MOVIE_API_URL }}
         run: |
+          echo "ECR_REGISTRY=$ECR_REGISTRY"
           docker build \
             --build-arg REACT_APP_MOVIE_API_URL="$REACT_APP_MOVIE_API_URL" \
             -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" \
@@ -86,7 +87,10 @@ jobs:
 
       - name: Apply Kustomize deployment
         working-directory: .
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
+          echo "Using ECR registry: $ECR_REGISTRY"
           kubectl apply -k starter/frontend/k8s
           kubectl set image deployment/frontend frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           kubectl rollout status deployment/frontend --timeout=180s || (kubectl describe deployment frontend; kubectl get pods -l app=frontend; exit 1)

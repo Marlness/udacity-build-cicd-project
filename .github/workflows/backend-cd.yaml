@@ -49,6 +49,7 @@ jobs:
       AWS_REGION: us-east-1
       ECR_REPOSITORY: backend
       IMAGE_TAG: ${{ github.sha }}
+      ECR_REGISTRY: ${{ vars.ECR_REGISTRY || steps.login-ecr.outputs.registry }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -71,9 +72,8 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push backend image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
+          echo "ECR_REGISTRY=$ECR_REGISTRY"
           docker build -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" -t "$ECR_REGISTRY/$ECR_REPOSITORY:latest" .
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
@@ -83,7 +83,10 @@ jobs:
 
       - name: Apply Kustomize deployment
         working-directory: .
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
+          echo "Using ECR registry: $ECR_REGISTRY"
           kubectl apply -k starter/backend/k8s
           kubectl set image deployment/backend backend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           kubectl rollout status deployment/backend --timeout=180s || (kubectl describe deployment backend; kubectl get pods -l app=backend; exit 1)
